@@ -53,3 +53,11 @@ export interface DashboardStats {
 }
 
 export type ViewState = 'DASHBOARD' | 'RESIDENTS' | 'FINANCE' | 'SETTINGS';
+
+export type UserRole = 'ADMIN' | 'STAFF';
+
+export interface User {
+  username: string;
+  name: string;
+  role: UserRole;
+}

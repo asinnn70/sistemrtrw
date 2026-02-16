@@ -5,11 +5,13 @@ import { ResidentList } from './components/ResidentList';
 import { ResidentForm } from './components/ResidentForm';
 import { FinanceDashboard } from './components/FinanceDashboard';
 import { TransactionForm } from './components/TransactionForm';
+import { Login } from './components/Login';
 import { INITIAL_RESIDENTS, INITIAL_TRANSACTIONS } from './constants';
-import { Resident, ViewState, Transaction } from './types';
+import { Resident, ViewState, Transaction, User } from './types';
 import { Menu } from 'lucide-react';
 
 const App: React.FC = () => {
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [currentView, setCurrentView] = useState<ViewState>('DASHBOARD');
   
   // Residents State
@@ -23,6 +25,17 @@ const App: React.FC = () => {
 
   // UI State
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  // Auth Handlers
+  const handleLogin = (user: User) => {
+    setCurrentUser(user);
+    setCurrentView('DASHBOARD');
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    setCurrentView('DASHBOARD');
+  };
 
   // Resident Handlers
   const handleDeleteResident = (id: string) => {
@@ -70,6 +83,11 @@ const App: React.FC = () => {
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
+  // Render Login if not authenticated
+  if (!currentUser) {
+    return <Login onLogin={handleLogin} />;
+  }
+
   return (
     <div className="flex h-screen bg-gray-50 font-sans">
       {/* Mobile Sidebar Overlay */}
@@ -87,7 +105,9 @@ const App: React.FC = () => {
           setCurrentView(view);
           setIsSidebarOpen(false);
         }} 
-        isOpen={isSidebarOpen} 
+        isOpen={isSidebarOpen}
+        user={currentUser}
+        onLogout={handleLogout}
       />
 
       {/* Main Content */}
@@ -119,11 +139,12 @@ const App: React.FC = () => {
                   onDelete={handleDeleteResident}
                   onAdd={handleAddResident}
                   onEdit={handleEditResident}
+                  userRole={currentUser.role}
                 />
               </div>
             )}
 
-            {currentView === 'FINANCE' && (
+            {currentView === 'FINANCE' && currentUser.role === 'ADMIN' && (
               <div className="animate-fade-in">
                  <div className="mb-6">
                   <h2 className="text-2xl font-bold text-gray-800">Kas RT/RW</h2>

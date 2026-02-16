@@ -1,8 +1,21 @@
-import { Resident, Gender, MaritalStatus, Transaction } from './types';
+import { Resident, Gender, MaritalStatus, Transaction, User } from './types';
 
 export const GEMINI_MODEL_ID = 'gemini-3-flash-preview';
 
 export const SYSTEM_INSTRUCTION = 'Anda adalah asisten virtual untuk sistem manajemen kependudukan RT. Jawab pertanyaan berdasarkan data warga yang diberikan dalam format JSON. Bersikaplah profesional, membantu, dan gunakan Bahasa Indonesia yang baik.';
+
+export const MOCK_USERS: User[] = [
+  {
+    username: 'admin',
+    name: 'Pak RT',
+    role: 'ADMIN'
+  },
+  {
+    username: 'staff',
+    name: 'Sekretaris',
+    role: 'STAFF'
+  }
+];
 
 export const INITIAL_RESIDENTS: Resident[] = [
   {

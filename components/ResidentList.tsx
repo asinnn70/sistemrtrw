@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Resident, Gender, MaritalStatus } from '../types';
+import { Resident, Gender, MaritalStatus, UserRole } from '../types';
 import { Search, Plus, Trash2, Edit2, MapPin, Phone, FileSpreadsheet } from 'lucide-react';
 import { exportToExcel, formatResidentsForExport } from '../services/exportService';
 
@@ -8,9 +8,10 @@ interface ResidentListProps {
   onDelete: (id: string) => void;
   onAdd: () => void;
   onEdit: (resident: Resident) => void;
+  userRole: UserRole;
 }
 
-export const ResidentList: React.FC<ResidentListProps> = ({ residents, onDelete, onAdd, onEdit }) => {
+export const ResidentList: React.FC<ResidentListProps> = ({ residents, onDelete, onAdd, onEdit, userRole }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredResidents = residents.filter(r => 
@@ -115,13 +116,15 @@ export const ResidentList: React.FC<ResidentListProps> = ({ residents, onDelete,
                       >
                         <Edit2 className="w-4 h-4" />
                       </button>
-                      <button 
-                        onClick={() => onDelete(resident.id)}
-                        className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                        title="Hapus"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      {userRole === 'ADMIN' && (
+                        <button 
+                          onClick={() => onDelete(resident.id)}
+                          className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Hapus"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
