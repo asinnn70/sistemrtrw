@@ -6,6 +6,7 @@ import { ResidentForm } from './components/ResidentForm';
 import { FinanceDashboard } from './components/FinanceDashboard';
 import { TransactionForm } from './components/TransactionForm';
 import { Login } from './components/Login';
+import { MemberCard } from './components/MemberCard';
 import { INITIAL_RESIDENTS, INITIAL_TRANSACTIONS } from './constants';
 import { Resident, ViewState, Transaction, User } from './types';
 import { Menu } from 'lucide-react';
@@ -18,6 +19,10 @@ const App: React.FC = () => {
   const [residents, setResidents] = useState<Resident[]>(INITIAL_RESIDENTS);
   const [editingResident, setEditingResident] = useState<Resident | undefined>(undefined);
   const [isResidentFormOpen, setIsResidentFormOpen] = useState(false);
+  
+  // Member Card State
+  const [selectedCardResident, setSelectedCardResident] = useState<Resident | undefined>(undefined);
+  const [isMemberCardOpen, setIsMemberCardOpen] = useState(false);
 
   // Transactions State
   const [transactions, setTransactions] = useState<Transaction[]>(INITIAL_TRANSACTIONS);
@@ -52,6 +57,11 @@ const App: React.FC = () => {
   const handleEditResident = (resident: Resident) => {
     setEditingResident(resident);
     setIsResidentFormOpen(true);
+  };
+  
+  const handleViewCard = (resident: Resident) => {
+    setSelectedCardResident(resident);
+    setIsMemberCardOpen(true);
   };
 
   const handleResidentFormSubmit = (data: Omit<Resident, 'id'>) => {
@@ -139,6 +149,7 @@ const App: React.FC = () => {
                   onDelete={handleDeleteResident}
                   onAdd={handleAddResident}
                   onEdit={handleEditResident}
+                  onViewCard={handleViewCard}
                   userRole={currentUser.role}
                 />
               </div>
@@ -166,6 +177,12 @@ const App: React.FC = () => {
         onClose={() => setIsResidentFormOpen(false)}
         onSubmit={handleResidentFormSubmit}
         initialData={editingResident}
+      />
+
+      <MemberCard 
+        isOpen={isMemberCardOpen}
+        onClose={() => setIsMemberCardOpen(false)}
+        resident={selectedCardResident}
       />
 
       <TransactionForm

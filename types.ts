@@ -19,6 +19,7 @@ export interface Resident {
   occupation: string;
   maritalStatus: MaritalStatus;
   phoneNumber: string;
+  photo?: string; // Base64 image string
 }
 
 export type TransactionType = 'INCOME' | 'EXPENSE';

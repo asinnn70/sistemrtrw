@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Resident, Gender, MaritalStatus } from '../types';
-import { X } from 'lucide-react';
+import { X, Upload, User as UserIcon, Trash2 } from 'lucide-react';
 
 interface ResidentFormProps {
   isOpen: boolean;
@@ -18,7 +18,8 @@ export const ResidentForm: React.FC<ResidentFormProps> = ({ isOpen, onClose, onS
     address: '',
     occupation: '',
     maritalStatus: MaritalStatus.SINGLE,
-    phoneNumber: ''
+    phoneNumber: '',
+    photo: ''
   });
 
   useEffect(() => {
@@ -31,7 +32,8 @@ export const ResidentForm: React.FC<ResidentFormProps> = ({ isOpen, onClose, onS
         address: initialData.address,
         occupation: initialData.occupation,
         maritalStatus: initialData.maritalStatus,
-        phoneNumber: initialData.phoneNumber
+        phoneNumber: initialData.phoneNumber,
+        photo: initialData.photo || ''
       });
     } else {
       setFormData({
@@ -42,7 +44,8 @@ export const ResidentForm: React.FC<ResidentFormProps> = ({ isOpen, onClose, onS
         address: '',
         occupation: '',
         maritalStatus: MaritalStatus.SINGLE,
-        phoneNumber: ''
+        phoneNumber: '',
+        photo: ''
       });
     }
   }, [initialData, isOpen]);
@@ -53,6 +56,26 @@ export const ResidentForm: React.FC<ResidentFormProps> = ({ isOpen, onClose, onS
     e.preventDefault();
     onSubmit(formData);
     onClose();
+  };
+
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) { // Limit 2MB
+        alert('Ukuran foto maksimal 2MB');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({ ...prev, photo: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removePhoto = () => {
+    setFormData(prev => ({ ...prev, photo: '' }));
   };
 
   return (
@@ -67,7 +90,46 @@ export const ResidentForm: React.FC<ResidentFormProps> = ({ isOpen, onClose, onS
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          {/* Photo Upload Section */}
+          <div className="flex flex-col items-center justify-center mb-6">
+             <div className="relative group">
+                <div className="w-32 h-40 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden">
+                  {formData.photo ? (
+                    <img src={formData.photo} alt="Preview" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="text-center p-4">
+                      <UserIcon className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                      <span className="text-xs text-gray-500">Upload Foto</span>
+                    </div>
+                  )}
+                </div>
+                
+                <div className="absolute bottom-2 right-2 flex gap-2">
+                   {formData.photo && (
+                     <button
+                       type="button"
+                       onClick={removePhoto}
+                       className="p-1.5 bg-red-600 text-white rounded-full hover:bg-red-700 shadow-sm"
+                       title="Hapus Foto"
+                     >
+                       <Trash2 className="w-3 h-3" />
+                     </button>
+                   )}
+                   <label className="p-1.5 bg-blue-600 text-white rounded-full hover:bg-blue-700 shadow-sm cursor-pointer">
+                      <Upload className="w-3 h-3" />
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        className="hidden" 
+                        onChange={handlePhotoChange}
+                      />
+                   </label>
+                </div>
+             </div>
+             <p className="text-xs text-gray-500 mt-2">Format: JPG, PNG (Max 2MB)</p>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">NIK</label>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Resident, Gender, MaritalStatus, UserRole } from '../types';
-import { Search, Plus, Trash2, Edit2, MapPin, Phone, FileSpreadsheet } from 'lucide-react';
+import { Search, Plus, Trash2, Edit2, MapPin, Phone, FileSpreadsheet, IdCard, User as UserIcon } from 'lucide-react';
 import { exportToExcel, formatResidentsForExport } from '../services/exportService';
 
 interface ResidentListProps {
@@ -8,10 +8,11 @@ interface ResidentListProps {
   onDelete: (id: string) => void;
   onAdd: () => void;
   onEdit: (resident: Resident) => void;
+  onViewCard: (resident: Resident) => void;
   userRole: UserRole;
 }
 
-export const ResidentList: React.FC<ResidentListProps> = ({ residents, onDelete, onAdd, onEdit, userRole }) => {
+export const ResidentList: React.FC<ResidentListProps> = ({ residents, onDelete, onAdd, onEdit, onViewCard, userRole }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredResidents = residents.filter(r => 
@@ -75,10 +76,19 @@ export const ResidentList: React.FC<ResidentListProps> = ({ residents, onDelete,
               filteredResidents.map((resident) => (
                 <tr key={resident.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4">
-                    <div className="flex flex-col">
-                      <span className="font-medium text-gray-900">{resident.fullName}</span>
-                      <span className="text-xs text-gray-500 font-mono">{resident.nik}</span>
-                      <span className="text-xs text-gray-400">{resident.gender} • {resident.birthDate}</span>
+                    <div className="flex items-center gap-3">
+                      {resident.photo ? (
+                        <img src={resident.photo} alt={resident.fullName} className="w-10 h-10 rounded-full object-cover border border-gray-200" />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+                          <UserIcon className="w-6 h-6" />
+                        </div>
+                      )}
+                      <div className="flex flex-col">
+                        <span className="font-medium text-gray-900">{resident.fullName}</span>
+                        <span className="text-xs text-gray-500 font-mono">{resident.nik}</span>
+                        <span className="text-xs text-gray-400">{resident.gender} • {resident.birthDate}</span>
+                      </div>
                     </div>
                   </td>
                   <td className="px-6 py-4">
@@ -109,6 +119,13 @@ export const ResidentList: React.FC<ResidentListProps> = ({ residents, onDelete,
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2">
+                      <button 
+                        onClick={() => onViewCard(resident)}
+                        className="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                        title="Kartu Anggota"
+                      >
+                        <IdCard className="w-4 h-4" />
+                      </button>
                       <button 
                         onClick={() => onEdit(resident)}
                         className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
