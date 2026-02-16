@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react';
 import { Transaction } from '../types';
 import { StatsCard } from './StatsCard';
-import { Wallet, TrendingUp, TrendingDown, Plus, Trash2 } from 'lucide-react';
+import { Wallet, TrendingUp, TrendingDown, Plus, Trash2, FileSpreadsheet } from 'lucide-react';
+import { exportToExcel, formatTransactionsForExport } from '../services/exportService';
 
 interface FinanceDashboardProps {
   transactions: Transaction[];
@@ -48,6 +49,12 @@ export const FinanceDashboard: React.FC<FinanceDashboardProps> = ({
     });
   };
 
+  const handleExport = () => {
+    const dataToExport = formatTransactionsForExport(transactions);
+    const dateStr = new Date().toISOString().split('T')[0];
+    exportToExcel(dataToExport, `Laporan_Keuangan_RT_${dateStr}`, 'Keuangan');
+  };
+
   // Sort transactions by date descending
   const sortedTransactions = [...transactions].sort((a, b) => 
     new Date(b.date).getTime() - new Date(a.date).getTime()
@@ -77,15 +84,24 @@ export const FinanceDashboard: React.FC<FinanceDashboardProps> = ({
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+        <div className="p-6 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <h2 className="text-xl font-bold text-gray-800">Riwayat Transaksi</h2>
-          <button 
-            onClick={onAddTransaction}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            Catat Transaksi
-          </button>
+          <div className="flex gap-2">
+            <button 
+              onClick={handleExport}
+              className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            >
+              <FileSpreadsheet className="w-4 h-4" />
+              Export Excel
+            </button>
+            <button 
+              onClick={onAddTransaction}
+              className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              Catat Transaksi
+            </button>
+          </div>
         </div>
 
         <div className="overflow-x-auto">

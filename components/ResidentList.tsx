@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Resident, Gender, MaritalStatus } from '../types';
-import { Search, Plus, Trash2, Edit2, MapPin, Phone } from 'lucide-react';
+import { Search, Plus, Trash2, Edit2, MapPin, Phone, FileSpreadsheet } from 'lucide-react';
+import { exportToExcel, formatResidentsForExport } from '../services/exportService';
 
 interface ResidentListProps {
   residents: Resident[];
@@ -17,6 +18,12 @@ export const ResidentList: React.FC<ResidentListProps> = ({ residents, onDelete,
     r.nik.includes(searchTerm) ||
     r.address.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleExport = () => {
+    const dataToExport = formatResidentsForExport(filteredResidents); // Export filtered results
+    const dateStr = new Date().toISOString().split('T')[0];
+    exportToExcel(dataToExport, `Data_Warga_RT_${dateStr}`, 'Warga');
+  };
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
@@ -35,11 +42,18 @@ export const ResidentList: React.FC<ResidentListProps> = ({ residents, onDelete,
             />
           </div>
           <button 
+            onClick={handleExport}
+            className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+          >
+            <FileSpreadsheet className="w-4 h-4" />
+            Excel
+          </button>
+          <button 
             onClick={onAdd}
             className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
           >
             <Plus className="w-4 h-4" />
-            Tambah Warga
+            Tambah
           </button>
         </div>
       </div>
