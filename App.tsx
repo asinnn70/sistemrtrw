@@ -7,6 +7,8 @@ import { FinanceDashboard } from './components/FinanceDashboard';
 import { TransactionForm } from './components/TransactionForm';
 import { Login } from './components/Login';
 import { MemberCard } from './components/MemberCard';
+import { Settings } from './components/Settings';
+import { ServicesMenu } from './components/ServicesMenu';
 import { INITIAL_RESIDENTS, INITIAL_TRANSACTIONS } from './constants';
 import { Resident, ViewState, Transaction, User } from './types';
 import { Menu } from 'lucide-react';
@@ -155,6 +157,13 @@ const App: React.FC = () => {
               </div>
             )}
 
+            {currentView === 'SERVICES' && (
+              <ServicesMenu 
+                residents={residents}
+                onAddResident={handleAddResident}
+              />
+            )}
+
             {currentView === 'FINANCE' && currentUser.role === 'ADMIN' && (
               <div className="animate-fade-in">
                  <div className="mb-6">
@@ -166,6 +175,16 @@ const App: React.FC = () => {
                   onAddTransaction={handleAddTransaction}
                   onDeleteTransaction={handleDeleteTransaction}
                 />
+              </div>
+            )}
+
+            {currentView === 'SETTINGS' && currentUser.role === 'ADMIN' && (
+              <div className="animate-fade-in">
+                <div className="mb-6">
+                  <h2 className="text-2xl font-bold text-gray-800">Pengaturan</h2>
+                  <p className="text-gray-500">Konfigurasi sistem dan integrasi.</p>
+                </div>
+                <Settings onSave={() => setCurrentView('RESIDENTS')} />
               </div>
             )}
           </div>

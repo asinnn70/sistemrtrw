@@ -53,7 +53,7 @@ export interface DashboardStats {
   totalFamilies: number;
 }
 
-export type ViewState = 'DASHBOARD' | 'RESIDENTS' | 'FINANCE' | 'SETTINGS';
+export type ViewState = 'DASHBOARD' | 'RESIDENTS' | 'FINANCE' | 'SETTINGS' | 'SERVICES';
 
 export type UserRole = 'ADMIN' | 'STAFF';
 

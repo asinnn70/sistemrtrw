@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Resident, Gender, MaritalStatus, UserRole } from '../types';
-import { Search, Plus, Trash2, Edit2, MapPin, Phone, FileSpreadsheet, IdCard, User as UserIcon } from 'lucide-react';
+import { Search, Plus, Trash2, Edit2, MapPin, Phone, FileSpreadsheet, IdCard, User as UserIcon, CloudUpload, Loader2 } from 'lucide-react';
 import { exportToExcel, formatResidentsForExport } from '../services/exportService';
+import { syncResidentsToSheets } from '../services/googleSheetsService';
 
 interface ResidentListProps {
   residents: Resident[];
@@ -14,6 +15,7 @@ interface ResidentListProps {
 
 export const ResidentList: React.FC<ResidentListProps> = ({ residents, onDelete, onAdd, onEdit, onViewCard, userRole }) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [isSyncing, setIsSyncing] = useState(false);
 
   const filteredResidents = residents.filter(r => 
     r.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -22,9 +24,32 @@ export const ResidentList: React.FC<ResidentListProps> = ({ residents, onDelete,
   );
 
   const handleExport = () => {
-    const dataToExport = formatResidentsForExport(filteredResidents); // Export filtered results
+    const dataToExport = formatResidentsForExport(filteredResidents);
     const dateStr = new Date().toISOString().split('T')[0];
     exportToExcel(dataToExport, `Data_Warga_RT_${dateStr}`, 'Warga');
+  };
+
+  const handleSync = async () => {
+    const scriptUrl = localStorage.getItem('googleSheetScriptUrl');
+    
+    if (!scriptUrl) {
+      alert('URL Google Apps Script belum dikonfigurasi. Silakan atur di menu Pengaturan.');
+      return;
+    }
+
+    if (!window.confirm('Apakah Anda ingin menyinkronkan (upload) data warga ke Google Sheets?')) {
+      return;
+    }
+
+    setIsSyncing(true);
+    try {
+      await syncResidentsToSheets(scriptUrl, residents);
+      alert('Sinkronisasi berhasil!');
+    } catch (error) {
+      alert('Sinkronisasi gagal. Pastikan URL valid dan Apps Script telah dideploy dengan akses "Anyone".');
+    } finally {
+      setIsSyncing(false);
+    }
   };
 
   return (
@@ -43,6 +68,18 @@ export const ResidentList: React.FC<ResidentListProps> = ({ residents, onDelete,
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
+          
+          {userRole === 'ADMIN' && (
+            <button 
+              onClick={handleSync}
+              disabled={isSyncing}
+              className={`flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isSyncing ? 'opacity-75 cursor-not-allowed' : ''}`}
+            >
+              {isSyncing ? <Loader2 className="w-4 h-4 animate-spin" /> : <CloudUpload className="w-4 h-4" />}
+              Sync
+            </button>
+          )}
+
           <button 
             onClick={handleExport}
             className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
@@ -50,6 +87,7 @@ export const ResidentList: React.FC<ResidentListProps> = ({ residents, onDelete,
             <FileSpreadsheet className="w-4 h-4" />
             Excel
           </button>
+          
           <button 
             onClick={onAdd}
             className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"

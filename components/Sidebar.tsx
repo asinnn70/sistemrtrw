@@ -1,6 +1,6 @@
 import React from 'react';
 import { ViewState, User } from '../types';
-import { LayoutDashboard, Users, Building2, Wallet, LogOut, UserCircle } from 'lucide-react';
+import { LayoutDashboard, Users, Building2, Wallet, LogOut, UserCircle, Settings, FileText } from 'lucide-react';
 
 interface SidebarProps {
   currentView: ViewState;
@@ -14,7 +14,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, isO
   const menuItems = [
     { id: 'DASHBOARD', label: 'Dashboard', icon: LayoutDashboard, roles: ['ADMIN', 'STAFF'] },
     { id: 'RESIDENTS', label: 'Data Warga', icon: Users, roles: ['ADMIN', 'STAFF'] },
+    { id: 'SERVICES', label: 'Layanan Surat', icon: FileText, roles: ['ADMIN', 'STAFF'] },
     { id: 'FINANCE', label: 'Kas RT/RW', icon: Wallet, roles: ['ADMIN'] }, // Only Admin
+    { id: 'SETTINGS', label: 'Pengaturan', icon: Settings, roles: ['ADMIN'] }, // Only Admin
   ];
 
   return (
